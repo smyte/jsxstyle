@@ -33,6 +33,7 @@ export interface ExtractStylesOptions {
 
 export interface Options {
   cacheObject: CacheObject;
+  compiledWhitelistedModules: object;
   errorCallback?: (str: string, ...args: any[]) => void;
   warnCallback?: (str: string, ...args: any[]) => void;
 }
@@ -109,7 +110,7 @@ export function extractStyles(
   src: string | Buffer,
   sourceFileName: string,
   /** non-user-configurable options */
-  { cacheObject, warnCallback, errorCallback }: Options,
+  { cacheObject, compiledWhitelistedModules, warnCallback, errorCallback }: Options,
   options: ExtractStylesOptions = {}
 ): {
   js: string | Buffer;
@@ -442,6 +443,7 @@ export function extractStyles(
               const staticNamespace = getStaticBindingsForScope(
                 traversePath.scope,
                 whitelistedModules,
+                compiledWhitelistedModules,
                 sourceFileName,
                 bindingCache
               );
