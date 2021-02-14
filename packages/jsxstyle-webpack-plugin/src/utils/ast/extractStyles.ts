@@ -23,8 +23,10 @@ import loaderSchema = require('../../loaderSchema.json');
 
 export interface ExtractStylesOptions {
   classNameFormat?: 'hash';
+  /** @deprecated */
   namedStyleGroups?: Record<string, Record<string, any>>;
   parserPlugins?: ParserPlugin[];
+  /** @deprecated */
   styleGroups?: Array<Record<string, any>>;
   whitelistedModules?: string[];
   cssModules?: boolean;
@@ -163,9 +165,7 @@ export function extractStyles(
 
   const {
     classNameFormat,
-    namedStyleGroups,
     parserPlugins: _parserPlugins,
-    styleGroups,
     whitelistedModules,
     cssModules,
     evaluateVars = true,
@@ -964,8 +964,6 @@ export function extractStyles(
         }
 
         const stylesByClassName = getStylesByClassName(
-          styleGroups,
-          namedStyleGroups,
           staticAttributes,
           cacheObject,
           classNameFormat

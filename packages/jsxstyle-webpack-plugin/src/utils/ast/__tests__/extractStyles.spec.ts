@@ -178,60 +178,6 @@ describe('cache object', () => {
   });
 });
 
-describe('style groups', () => {
-  it('groups styles when a `styleGroups` array is provided', () => {
-    const styleGroups = [
-      {
-        hoverThing: 'ok',
-        thing: 'wow',
-      },
-      {
-        display: 'inline-block',
-      },
-    ];
-
-    const rv = extractStyles(
-      `import {Block, InlineBlock} from "jsxstyle";
-<Block>
-  <Block thing="wow" hoverThing="ok" />
-  <InlineBlock />
-</Block>`,
-      pathTo('mock/style-groups.js'),
-      { cacheObject: {} },
-      { styleGroups }
-    );
-
-    expect(rv.js).toMatchSnapshot();
-    expect(rv.css).toMatchSnapshot();
-  });
-
-  it('groups styles when a `namedStyleGroups` object is provided', () => {
-    const namedStyleGroups = {
-      _test1: {
-        hoverThing: 'ok',
-        thing: 'wow',
-      },
-      _test2: {
-        display: 'inline-block',
-      },
-    };
-
-    const rv = extractStyles(
-      `import {Block, InlineBlock} from "jsxstyle";
-<Block>
-  <Block thing="wow" hoverThing="ok" />
-  <InlineBlock />
-</Block>`,
-      pathTo('mock/named-style-groups.js'),
-      { cacheObject: {} },
-      { namedStyleGroups }
-    );
-
-    expect(rv.js).toMatchSnapshot();
-    expect(rv.css).toMatchSnapshot();
-  });
-});
-
 describe('jsxstyle-specific props', () => {
   it('handles the `props` prop correctly', () => {
     const warnCallback = jest.fn();

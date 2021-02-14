@@ -326,62 +326,6 @@ exports[`spread operators handles reserved props before the spread operators 2`]
 "
 `;
 
-exports[`style groups groups styles when a \`namedStyleGroups\` object is provided 1`] = `
-"import \\"./named-style-groups__jsxstyle.css\\";
-<div className=\\"_x0\\">
-  <div className=\\"_test1 _x0\\" />
-  <div className=\\"_test2\\" />
-</div>;"
-`;
-
-exports[`style groups groups styles when a \`namedStyleGroups\` object is provided 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/named-style-groups.js:2 (Block) */
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/named-style-groups.js:3 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/named-style-groups.js:3 (Block) */
-._test1 {
-  thing: wow;
-}
-._test1:hover {
-  thing: ok;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/named-style-groups.js:4 (InlineBlock) */
-._test2 {
-  display: inline-block;
-}
-"
-`;
-
-exports[`style groups groups styles when a \`styleGroups\` array is provided 1`] = `
-"import \\"./style-groups__jsxstyle.css\\";
-<div className=\\"_x0\\">
-  <div className=\\"_x1 _x0\\" />
-  <div className=\\"_x2\\" />
-</div>;"
-`;
-
-exports[`style groups groups styles when a \`styleGroups\` array is provided 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/style-groups.js:2 (Block) */
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/style-groups.js:3 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/style-groups.js:3 (Block) */
-._x1 {
-  thing: wow;
-}
-._x1:hover {
-  thing: ok;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/style-groups.js:4 (InlineBlock) */
-._x2 {
-  display: inline-block;
-}
-"
-`;
-
 exports[`ternaries extracts a conditional expression with a static right side and an AND operator 1`] = `
 "import \\"./ternary__jsxstyle.css\\";
 <div className={(dynamic ? \\"_x1\\" : \\"\\") + \\" _x0\\"} />;"
