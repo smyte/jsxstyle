@@ -1,5 +1,5 @@
 import { addStyleToHead } from './addStyleToHead';
-import { getStyleKeysForProps } from './getStyleKeysForProps';
+import { getRulesForStyleProps } from './getStyleKeysForProps';
 import { stringHash } from './stringHash';
 
 type InsertRuleCallback = (
@@ -7,7 +7,7 @@ type InsertRuleCallback = (
   props?: Record<string, any>
 ) => boolean | void;
 
-type GetClassNameFn = (key: string, props?: Record<string, any>) => string;
+type GetClassNameFn = (key: string) => string;
 
 function cannotInject() {
   throw new Error(
@@ -29,7 +29,13 @@ export function getStyleCache() {
   let _classNameCache: Record<string, string> = {};
   let getClassNameForKey: GetClassNameFn = getStringHash;
   let onInsertRule: InsertRuleCallback;
-  let pretty = false;
+
+  const memoizedGetClassName = (key: string): string => {
+    if (!_classNameCache[key]) {
+      _classNameCache[key] = getClassNameForKey(key);
+    }
+    return _classNameCache[key];
+  };
 
   const styleCache = {
     reset() {
@@ -38,6 +44,7 @@ export function getStyleCache() {
 
     injectOptions(options?: {
       onInsertRule?: InsertRuleCallback;
+      /** @deprecated */
       pretty?: boolean;
       getClassName?: GetClassNameFn;
     }) {
@@ -48,8 +55,8 @@ export function getStyleCache() {
         if (options.onInsertRule) {
           onInsertRule = options.onInsertRule;
         }
-        if (options.pretty) {
-          pretty = options.pretty;
+        if (process.env.NODE_ENV === 'development' && options.pretty) {
+          console.error('The `pretty` option has been deprecated');
         }
       }
       styleCache.injectOptions = alreadyInjected;
@@ -61,55 +68,27 @@ export function getStyleCache() {
     ): string | null {
       styleCache.injectOptions = cannotInject;
 
-      const styleObj = getStyleKeysForProps(props, pretty);
-      if (styleObj == null) {
+      const processedStyles = getRulesForStyleProps(
+        props,
+        memoizedGetClassName
+      );
+      if (processedStyles == null) {
         return classNameProp || null;
       }
 
-      const key = styleObj.classNameKey;
-      if (key && !_classNameCache.hasOwnProperty(key)) {
-        _classNameCache[key] = getClassNameForKey(key, props);
-        Object.keys(styleObj.stylesByKey)
-          .sort()
-          .forEach((k) => {
-            const selector = '.' + _classNameCache[key];
-            // prettier-ignore
-            const { pseudoclass, pseudoelement, mediaQuery, styles } = styleObj.stylesByKey[k];
-
-            let rule =
-              selector +
-              (pseudoclass ? ':' + pseudoclass : '') +
-              (pseudoelement ? '::' + pseudoelement : '') +
-              ` {${styles}}`;
-
-            if (mediaQuery) {
-              rule = `@media ${mediaQuery} { ${rule} }`;
-            }
-
-            if (
-              onInsertRule &&
-              // if the function returns false, bail.
-              onInsertRule(rule, props) === false
-            ) {
-              return;
-            }
-            addStyleToHead(rule);
-          });
-      }
-
-      const animations = styleObj.animations;
-      if (animations) {
-        for (const animationKey in animations) {
-          const rule = `@keyframes ${animationKey} {${animations[animationKey]}}`;
-          if (!onInsertRule || onInsertRule(rule, props) !== false) {
-            addStyleToHead(rule);
-          }
+      for (const rule of processedStyles.rules) {
+        if (
+          !onInsertRule ||
+          // if the function returns false, bail.
+          onInsertRule(rule, props) !== false
+        ) {
+          addStyleToHead(rule);
         }
       }
 
-      return _classNameCache[key] && classNameProp
-        ? classNameProp + ' ' + _classNameCache[key]
-        : _classNameCache[key] || classNameProp || null;
+      return classNameProp
+        ? classNameProp + ' ' + processedStyles.className
+        : processedStyles.className;
     },
   };
 

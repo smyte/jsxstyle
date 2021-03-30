@@ -169,12 +169,14 @@ describe('cache object', () => {
       { cacheObject }
     );
 
-    expect(cacheObject).toEqual({
-      [Symbol.for('counter')]: 3,
-      'display:block;': '_x0',
-      'display:block;staticThing:wow;': '_x1',
-      'display:inline-block;': '_x2',
-    });
+    expect(cacheObject).toMatchInlineSnapshot(`
+      Object {
+        "display:block": "_x0",
+        "display:inline-block": "_x2",
+        "static-thing:wow": "_x1",
+        Symbol(counter): 2,
+      }
+    `);
   });
 });
 
@@ -366,18 +368,6 @@ describe('ternaries', () => {
     expect(rv.css).toMatchSnapshot();
   });
 
-  it.skip('extracts a conditional expression with a static right side and an OR operator', () => {
-    const rv = extractStyles(
-      `import {Block} from "jsxstyle";
-<Block color={dynamic || "red"} />`,
-      pathTo('mock/ternary.js'),
-      { cacheObject: {} }
-    );
-
-    expect(rv.js).toMatchSnapshot();
-    expect(rv.css).toMatchSnapshot();
-  });
-
   it('extracts a ternary expression that has a whitelisted consequent and alternate', () => {
     const rv = extractStyles(
       `import LC from "./LC";
@@ -402,6 +392,7 @@ const blue = "blueberry";
     );
 
     expect(rv.js).toMatchSnapshot();
+    expect(rv.css).toMatchSnapshot();
   });
 
   it('extracts a ternary expression from a component that has a spread operator specified', () => {
@@ -472,8 +463,15 @@ const blue = "blueberry";
       { cacheObject: {} }
     );
 
-    expect(rv.js).toEqual(`import { Box } from "jsxstyle";
-<Box display="block" color={dynamic ? "red" : "blue"} {...spread} className="cool" />;`);
+    expect(rv.js).toMatchInlineSnapshot(`
+      "import \\"./ternary-with-classname__jsxstyle.css\\";
+      import { Box } from \\"jsxstyle\\";
+      <Box display=\\"block\\" color={dynamic ? \\"red\\" : \\"blue\\"} {...spread} className=\\"cool\\" />;"
+    `);
+    expect(rv.css).toMatchInlineSnapshot(`
+      "
+      "
+    `);
   });
 
   it('groups extracted ternary statements', () => {

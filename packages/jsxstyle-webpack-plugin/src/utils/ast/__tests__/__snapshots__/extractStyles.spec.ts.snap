@@ -24,51 +24,32 @@ ReactDOM.render(<Thing />, (document.getElementById('root') as HTMLElement));"
 
 exports[`animation prop properly extracts object-type animation props 1`] = `
 "import \\"./animation-prop__jsxstyle.css\\";
-<div className=\\"_x0\\" />;"
+<div className=\\"_x0 _x1\\" />;"
 `;
 
 exports[`animation prop properly extracts object-type animation props 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/animation-prop.js:2-7 (Block) */
-._x0 {
-  animation-name: jsxstyle_nqjahi;
-  display: block;
-}
-@keyframes jsxstyle_nqjahi {
-0%, 50% {
-  opacity: 0;
-  padding-left: 30px;
-}
-100% {
-  opacity: 1;
-  padding-h: 50px;
-}
-}
+"@keyframes _x0 { 0%, 50% { opacity:0;padding-left:30px; } 100% { opacity:1;padding-h:50px; } }
+._x0 { animation-name:_x0 }
+._x1 { display:block }
 "
 `;
 
 exports[`deterministic rendering generates a classname hash of \`_d3bqdr\` for the specified style object 1`] = `
 "import \\"./consistent-hashes__jsxstyle.css\\";
-<div className=\\"_d3bqdr\\" />;"
+<div className=\\"_1jvcvsh _1vzzc6z _cmecz0 _fmtdho\\" />;"
 `;
 
 exports[`deterministic rendering generates a classname hash of \`_d3bqdr\` for the specified style object 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/consistent-hashes.js:2-9 (Block) */
-._d3bqdr {
-  color: red;
-  display: block;
-}
-._d3bqdr:hover {
-  color: green;
-}
-@media example media query { ._d3bqdr:active {
-  color: blue;
-} }
+"._1jvcvsh { color:red }
+._cmecz0 { display:block }
+._1vzzc6z:hover { color:green }
+@media example media query { ._fmtdho._fmtdho:active { color:blue } }
 "
 `;
 
 exports[`deterministic rendering generates deterministic class names when classNameFormat is set to \`hash\` 1`] = `
 "import \\"./deteministic-classes__jsxstyle.css\\";
-<div className={(condition ? \\"_nevmzf\\" : \\"_1ctok8s\\") + \\" _sfd7x3\\"} />;"
+<div className={(condition ? \\"_o84axs\\" : \\"_jzempz\\") + \\" _cmecz0\\"} />;"
 `;
 
 exports[`edge cases handles consts with no inits 1`] = `
@@ -80,7 +61,8 @@ for (const thing in things) {
 `;
 
 exports[`edge cases only removes component imports 1`] = `
-"import { cache, InvalidComponent } from 'jsxstyle';
+"import \\"./edge-case1__jsxstyle.css\\";
+import { cache, InvalidComponent } from 'jsxstyle';
 
 // should probably remove this as well
 require('jsxstyle');
@@ -96,18 +78,15 @@ exports[`element conversion converts jsxstyle elements to Block elements when so
 import { Box } from \\"jsxstyle\\";
 const val = \\"thing\\";
 import LC from \\"./LC\\";
-<Box dynamicValue={notStatic} className=\\"_x0\\" />;"
+<Box dynamicValue={notStatic} className=\\"_x0 _x1 _x2 _x3 _x4\\" />;"
 `;
 
 exports[`element conversion converts jsxstyle elements to Block elements when some props aren’t static 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/extract-static2.js:4 (Block) */
-._x0 {
-  display: block;
-  static-int: 69px;
-  static-member-expression: ok;
-  static-string: wow;
-  static-value: thing;
-}
+"._x0 { display:block }
+._x1 { static-int:69px }
+._x2 { static-member-expression:ok }
+._x3 { static-string:wow }
+._x4 { static-value:thing }
 "
 `;
 
@@ -115,34 +94,31 @@ exports[`element conversion converts jsxstyle elements to plain elements when al
 "import \\"./extract-static1__jsxstyle.css\\";
 import LC from \\"./LC\\";
 const val = \\"thing\\";
-<div className=\\"_x0\\" />;"
+<div className=\\"_x0 _x1 _x2 _x3 _x4 _x5 _x6\\" />;"
 `;
 
 exports[`element conversion converts jsxstyle elements to plain elements when all props are static 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/extract-static1.js:4-11 (Block) */
-._x0 {
-  display: block;
-  static-float: 6.9px;
-  static-int: 69px;
-  static-member-expression: ok;
-  static-negative-int: -420px;
-  static-string: wow;
-  static-value: thing;
-}
+"._x0 { display:block }
+._x1 { static-float:6.9px }
+._x2 { static-int:69px }
+._x3 { static-member-expression:ok }
+._x4 { static-negative-int:-420px }
+._x5 { static-string:wow }
+._x6 { static-value:thing }
 "
 `;
 
 exports[`evaluateVars config option does not evaluate vars if evaluateVars is set to false 1`] = `
 "import \\"./evaluateVars__jsxstyle.css\\";
 const staticProp = 'static';
-<div className=\\"_x0\\" />;"
+<div className=\\"_x0 _x1 _x2\\" />;"
 `;
 
 exports[`evaluateVars config option does not evaluate vars if evaluateVars is set to false 2`] = `
 "import \\"./evaluateVars__jsxstyle.css\\";
 import { Box } from \\"jsxstyle\\";
 const staticProp = 'static';
-<Box thing1={staticProp} className=\\"_x0\\" />;"
+<Box thing1={staticProp} className=\\"_x0 _x1\\" />;"
 `;
 
 exports[`jsxstyle-specific props converts complex \`component\` prop values to varable declarations 1`] = `
@@ -169,24 +145,19 @@ function Test({
 exports[`jsxstyle-specific props does not attempt to extract a ref prop found on a jsxstyle component 1`] = `
 "import \\"./props-prop2__jsxstyle.css\\";
 import { Box } from \\"jsxstyle\\";
-<Box ref={this.cannotBeExtracted} className=\\"_x0\\" />;"
+<Box ref={this.cannotBeExtracted} className=\\"_x0 _x1\\" />;"
 `;
 
 exports[`jsxstyle-specific props evaluates the \`mediaQueries\` prop correctly 1`] = `
 "import \\"./media-queries__jsxstyle.css\\";
 import LC from \\"./LC\\";
-<div className=\\"_x0\\" />;"
+<div className=\\"_x0 _x1 _x2\\" />;"
 `;
 
 exports[`jsxstyle-specific props evaluates the \`mediaQueries\` prop correctly 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/media-queries.js:3-7 (Block) */
-._x0 {
-  display: block;
-  width: 640px;
-}
-@media small media query { ._x0 {
-  width: 100%;
-} }
+"._x0 { display:block }
+@media small media query { ._x1._x1 { width:100% } }
+._x2 { width:640px }
 "
 `;
 
@@ -204,23 +175,18 @@ import { Box } from \\"jsxstyle\\";
 <Thing className=\\"_x0\\" />;
 <thing.cool className=\\"_x0\\" />;
 <Box display=\\"block\\" component=\\"h1\\" {...spread} />;
-<Box component=\\"h1\\" dynamic={wow} className=\\"_x1\\" />;"
+<Box component=\\"h1\\" dynamic={wow} className=\\"_x0 _x1 _x2\\" />;"
 `;
 
 exports[`jsxstyle-specific props handles the \`mediaQueries\` prop correctly 1`] = `
 "import \\"./media-queries__jsxstyle.css\\";
-<div className=\\"_x0\\" />;"
+<div className=\\"_x0 _x1 _x2\\" />;"
 `;
 
 exports[`jsxstyle-specific props handles the \`mediaQueries\` prop correctly 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/media-queries.js:2-6 (Block) */
-._x0 {
-  display: block;
-  width: 640px;
-}
-@media only screen and (min-width: 640px) { ._x0 {
-  width: 100%;
-} }
+"._x0 { display:block }
+@media only screen and (min-width: 640px) { ._x1._x1 { width:100% } }
+._x2 { width:640px }
 "
 `;
 
@@ -237,7 +203,7 @@ import { Box } from \\"jsxstyle\\";
   three,
   four: \\"five\\",
   ...six
-}} className=\\"_x1\\" />;
+}} className=\\"_x0 _x1\\" />;
 <div aria-hidden={true} className=\\"_x0\\" />;
 <Box props={{
   className: \\"test\\"
@@ -279,20 +245,17 @@ const staticSpread = {
 };
 
 function Thing(props) {
-  return <div className=\\"_x0\\" />;
+  return <div className=\\"_x0 _x1 _x2 _x3 _x4 _x5\\" />;
 }"
 `;
 
 exports[`spread operators extracts spreads from trusted sources 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/trusted-spreads.js:9 (Block) */
-._x0 {
-  background-color: #FFF;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.07);
-  color: #444;
-  display: block;
-  width: 420px;
-}
+"._x0 { background-color:#FFF }
+._x1 { border-radius:4px }
+._x2 { box-shadow:0 1px 3px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.07) }
+._x3 { color:#444 }
+._x4 { display:block }
+._x5 { width:420px }
 "
 `;
 
@@ -303,10 +266,7 @@ import { Box } from \\"jsxstyle\\";
 `;
 
 exports[`spread operators handles props mixed with spread operators 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/spread.js:2 (Block) */
-._x0 {
-  extract: yep;
-}
+"._x0 { extract:yep }
 "
 `;
 
@@ -319,10 +279,7 @@ import { Box } from \\"jsxstyle\\";
 `;
 
 exports[`spread operators handles reserved props before the spread operators 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/spread.js:2-11 (Block) */
-._x0 {
-  color: red;
-}
+"._x0 { color:red }
 "
 `;
 
@@ -332,20 +289,21 @@ exports[`ternaries extracts a conditional expression with a static right side an
 `;
 
 exports[`ternaries extracts a conditional expression with a static right side and an AND operator 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary.js:2 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary.js:2 (Block) */
-._x1 {
-  color: red;
-}
+"._x0 { display:block }
+._x1 { color:red }
 "
 `;
 
 exports[`ternaries extracts a ternary expression from a component that has a className specified 1`] = `
 "import \\"./ternary-with-classname__jsxstyle.css\\";
 <div className={\\"cool \\" + (dynamic ? \\"_x1\\" : \\"_x2\\") + \\" _x0\\"} />;"
+`;
+
+exports[`ternaries extracts a ternary expression from a component that has a className specified 2`] = `
+"._x0 { display:block }
+._x1 { color:red }
+._x2 { color:blue }
+"
 `;
 
 exports[`ternaries extracts a ternary expression from a component that has a spread operator specified 1`] = `
@@ -355,14 +313,8 @@ import { Box } from \\"jsxstyle\\";
 `;
 
 exports[`ternaries extracts a ternary expression from a component that has a spread operator specified 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary-with-spread.js:2 (Block) */
-._x0 {
-  color: red;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary-with-spread.js:2 (Block) */
-._x1 {
-  color: blue;
-}
+"._x0 { color:red }
+._x1 { color:blue }
 "
 `;
 
@@ -374,18 +326,9 @@ const blue = \\"blueberry\\";
 `;
 
 exports[`ternaries extracts a ternary expression that has a whitelisted consequent and alternate 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary.js:4 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary.js:4 (Block) */
-._x1 {
-  color: strawberry;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary.js:4 (Block) */
-._x2 {
-  color: blueberry;
-}
+"._x0 { display:block }
+._x1 { color:strawberry }
+._x2 { color:blueberry }
 "
 `;
 
@@ -396,24 +339,15 @@ exports[`ternaries extracts a ternary expression that has static consequent and 
 
 exports[`ternaries groups extracted ternary statements 1`] = `
 "import \\"./ternary-groups__jsxstyle.css\\";
-<div className={(dynamic ? \\"_x1\\" : \\"_x2\\") + \\" _x0\\"} />;"
+<div className={(dynamic ? \\"_x1 _x2\\" : \\"_x3 _x4\\") + \\" _x0\\"} />;"
 `;
 
 exports[`ternaries groups extracted ternary statements 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary-groups.js:2 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary-groups.js:2 (Block) */
-._x1 {
-  color: red;
-  width: 200px;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary-groups.js:2 (Block) */
-._x2 {
-  color: blue;
-  width: 400px;
-}
+"._x0 { display:block }
+._x1 { color:red }
+._x2 { width:200px }
+._x3 { color:blue }
+._x4 { width:400px }
 "
 `;
 
@@ -423,83 +357,59 @@ exports[`ternaries handles null values in ternaries correctly 1`] = `
 `;
 
 exports[`ternaries handles null values in ternaries correctly 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary-null-values.js:2 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/ternary-null-values.js:2 (Block) */
-._x1 {
-  color: blue;
-}
+"._x0 { display:block }
+._x1 { color:blue }
 "
 `;
 
 exports[`ternaries positivizes binary expressions 1`] = `
 "import \\"./binary-expressions__jsxstyle.css\\";
-<div className={(dynamic === 4 ? \\"_x1\\" : \\"_x2\\") + \\" _x0\\"} />;"
+<div className={(dynamic === 4 ? \\"_x1 _x2 _x3\\" : \\"_x4 _x5 _x6\\") + \\" _x0\\"} />;"
 `;
 
 exports[`ternaries positivizes binary expressions 2`] = `
 "import \\"./binary-expressions__jsxstyle.css\\";
-<div className={(dynamic == 4 ? \\"_x1\\" : \\"_x2\\") + \\" _x0\\"} />;"
+<div className={(dynamic == 4 ? \\"_x1 _x2 _x3\\" : \\"_x4 _x5 _x6\\") + \\" _x0\\"} />;"
 `;
 
 exports[`ternaries positivizes binary expressions 3`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/binary-expressions.js:2-7 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/binary-expressions.js:2-7 (Block) */
-._x1 {
-  thing1: four;
-  thing3: four;
-  thing4: four;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/binary-expressions.js:2-7 (Block) */
-._x2 {
-  thing2: not four;
-  thing3: not four;
-  thing4: not four;
-}
+"._x0 { display:block }
+._x1 { thing1:four }
+._x2 { thing3:four }
+._x3 { thing4:four }
+._x4 { thing2:not four }
+._x5 { thing3:not four }
+._x6 { thing4:not four }
 "
 `;
 
 exports[`ternaries positivizes unary expressions 1`] = `
 "import \\"./unary-expressions__jsxstyle.css\\";
-<div className={(dynamic % 2 ? \\"_x1\\" : \\"_x2\\") + \\" _x0\\"} />;"
+<div className={(dynamic % 2 ? \\"_x1 _x2 _x3\\" : \\"_x4 _x5 _x6\\") + \\" _x0\\"} />;"
 `;
 
 exports[`ternaries positivizes unary expressions 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/unary-expressions.js:2-7 (Block) */
-._x0 {
-  display: block;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/unary-expressions.js:2-7 (Block) */
-._x1 {
-  thing1: mod 2;
-  thing3: mod 2;
-  thing4: mod 2;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/unary-expressions.js:2-7 (Block) */
-._x2 {
-  thing2: not mod 2;
-  thing3: not mod 2;
-  thing4: not mod 2;
-}
+"._x0 { display:block }
+._x1 { thing1:mod 2 }
+._x2 { thing3:mod 2 }
+._x3 { thing4:mod 2 }
+._x4 { thing2:not mod 2 }
+._x5 { thing3:not mod 2 }
+._x6 { thing4:not mod 2 }
 "
 `;
 
 exports[`the basics only extracts styles from valid jsxstyle components 1`] = `
 "import \\"./validate__jsxstyle.css\\";
 <Block extract=\\"nope\\" />;
-<div className=\\"_x0\\" />;
-<div className=\\"_x1\\" />;
+<div className=\\"_x0 _x1\\" />;
+<div className=\\"_x1 _x2 _x3\\" />;
 <Col extract=\\"nope\\" />;
 <InlineBlock extract=\\"nope\\" />;
-<div className=\\"_x2\\" />;
-<div className=\\"_x3\\" />;
-<div className=\\"_x4\\" />;
-<div className=\\"_x5\\" />;"
+<div className=\\"_x1 _x2\\" />;
+<div className=\\"_x1 _x3 _x4\\" />;
+<div className=\\"_x1 _x4 _x5\\" />;
+<div className=\\"_x1 _x2 _x5\\" />;"
 `;
 
 exports[`the basics puts spaces between each class name 1`] = `
@@ -514,28 +424,16 @@ import React from 'react';
 export const MyComponent = () => {
   const useMatchMedia_matchesMQ = /*#__PURE__*/useMatchMedia('matchMedia media query');
   return <>
-        <div className=\\"_x0\\" />
-        <div className=\\"_x1\\" />
+        <div className=\\"_x0 _x1\\" />
+        <div className=\\"_x0 _x1 _x2\\" />
       </>;
 };"
 `;
 
 exports[`useMatchMedia extracts ternaries and conditional statements 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/useMatchMedia-extraction.js:8-10 (Block) */
-._x0 {
-  display: block;
-}
-@media matchMedia media query { ._x0 {
-  color: red;
-} }
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/useMatchMedia-extraction.js:11-13 (Block) */
-._x1 {
-  color: blue;
-  display: block;
-}
-@media matchMedia media query { ._x1 {
-  color: red;
-} }
+"._x0 { display:block }
+@media matchMedia media query { ._x1._x1 { color:red } }
+._x2 { color:blue }
 "
 `;
 
@@ -546,38 +444,18 @@ import React from 'react';
 export const MyComponent = () => {
   const useMatchMedia_matchesMQ = /*#__PURE__*/useMatchMedia('matchMedia media query');
   return <>
-        <div className={(useMatchMedia_matchesMQ ? \\"_x1\\" : \\"_x2\\") + \\" _x0\\"} />
-        <div className={(useMatchMedia_matchesMQ ? \\"_x1\\" : \\"_x2\\") + \\" _x3\\"} />
+        <div className={(useMatchMedia_matchesMQ ? \\"_x2\\" : \\"_x3\\") + \\" _x0 _x1\\"} />
+        <div className={(useMatchMedia_matchesMQ ? \\"_x2\\" : \\"_x3\\") + \\" _x0 _x1 _x4\\"} />
       </>;
 };"
 `;
 
 exports[`useMatchMedia logs a warning when a \`mediaQueries\` prop is encountered 2`] = `
-"/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/mediaqueries-plus-useMatchMedia.js:8-12 (Block) */
-._x0 {
-  display: block;
-}
-@media inline media query { ._x0 {
-  color: red;
-} }
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/mediaqueries-plus-useMatchMedia.js:8-12 (Block) */
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/mediaqueries-plus-useMatchMedia.js:13-18 (Block) */
-._x1 {
-  should-remain-inline: consequent;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/mediaqueries-plus-useMatchMedia.js:8-12 (Block) */
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/mediaqueries-plus-useMatchMedia.js:13-18 (Block) */
-._x2 {
-  should-remain-inline: alternate;
-}
-/* ./packages/jsxstyle-webpack-plugin/src/utils/ast/__tests__/mock/mediaqueries-plus-useMatchMedia.js:13-18 (Block) */
-._x3 {
-  color: blue;
-  display: block;
-}
-@media inline media query { ._x3 {
-  color: red;
-} }
+"._x0 { display:block }
+@media inline media query { ._x1._x1 { color:red } }
+._x2 { should-remain-inline:consequent }
+._x3 { should-remain-inline:alternate }
+._x4 { color:blue }
 "
 `;
 

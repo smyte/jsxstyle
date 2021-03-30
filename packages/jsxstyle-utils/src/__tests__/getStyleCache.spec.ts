@@ -1,132 +1,128 @@
 import { getStyleCache } from '..';
 
 const kitchenSink = {
-  activeFlex: 3,
-  flex: 1,
-  hoverFlex: 4,
   mediaQueries: { test: 'test' },
+  flex: 1,
   placeholderFlex: 2,
+  activeFlex: 3,
+  hoverFlex: 4,
   placeholderHoverFlex: 5,
-  testActiveFlex: 8,
   testFlex: 6,
-  testHoverFlex: 9,
   testPlaceholderFlex: 7,
+  testActiveFlex: 8,
+  testHoverFlex: 9,
   testPlaceholderHoverFlex: 10,
+};
+
+const getClassNameAndRules = (
+  styleObj: Record<string, any>,
+  classNameProp?: string
+) => {
+  const styleCache = getStyleCache();
+  const rules: string[] = [];
+  styleCache.injectOptions({
+    onInsertRule: (css) => {
+      rules.push(css);
+    },
+  });
+  const className = styleCache.getClassName(styleObj, classNameProp);
+  return { rules, className };
 };
 
 describe('styleCache', () => {
   it('combines class names if `className` prop is present', () => {
-    const styleCache = getStyleCache();
-    const className = styleCache.getClassName(
-      { display: 'inline', color: 'red' },
-      'bla'
-    );
-    expect(className).toBe('bla _1ioutjs');
+    expect(getClassNameAndRules({ display: 'inline', color: 'red' }, 'bla'))
+      .toMatchInlineSnapshot(`
+      Object {
+        "className": "bla _1jvcvsh _1lvn9cc",
+        "rules": Array [
+          "._1jvcvsh { color:red }",
+          "._1lvn9cc { display:inline }",
+        ],
+      }
+    `);
   });
 
   it('generates deterministic class names', () => {
-    const styleCache = getStyleCache();
-    const className = styleCache.getClassName({ wow: 'cool' });
-    expect(className).toBe('_1lqd3t0');
+    expect(getClassNameAndRules({ wow: 'cool' })).toMatchInlineSnapshot(`
+      Object {
+        "className": "_1b8zaqn",
+        "rules": Array [
+          "._1b8zaqn { wow:cool }",
+        ],
+      }
+    `);
   });
 
   it('generates a classname hash of `_d3bqdr` for the specified style object', () => {
-    const styleCache = getStyleCache();
-    const className = styleCache.getClassName({
-      color: 'red',
-      display: 'block',
-      hoverColor: 'green',
-      mediaQueries: {
-        test: 'example media query',
-      },
-      testActiveColor: 'blue',
-    });
-    expect(className).toEqual('_d3bqdr');
+    expect(
+      getClassNameAndRules({
+        color: 'red',
+        display: 'block',
+        hoverColor: 'green',
+        mediaQueries: {
+          test: 'example media query',
+        },
+        testActiveColor: 'blue',
+      })
+    ).toMatchInlineSnapshot(`
+      Object {
+        "className": "_1jvcvsh _1vzzc6z _cmecz0 _fmtdho",
+        "rules": Array [
+          "._1jvcvsh { color:red }",
+          "._cmecz0 { display:block }",
+          "._1vzzc6z:hover { color:green }",
+          "@media example media query { ._fmtdho._fmtdho:active { color:blue } }",
+        ],
+      }
+    `);
   });
 
   it('returns null when given an empty style object', () => {
-    const styleCache = getStyleCache();
-    const className = styleCache.getClassName({});
-    expect(className).toBeNull();
+    expect(getClassNameAndRules({}).className).toBeNull();
   });
 
   it('converts a style object to a sorted object of objects', () => {
-    const styleCache = getStyleCache();
-    const styles: string[] = [];
-    styleCache.injectOptions({
-      onInsertRule: (css) => {
-        styles.push(css);
-      },
-    });
-    const className = styleCache.getClassName(kitchenSink);
-
-    expect(styles).toEqual([
-      `.${className} {flex:1;}`,
-      `.${className}::placeholder {flex:2;}`,
-      `.${className}:active {flex:3;}`,
-      `.${className}:hover {flex:4;}`,
-      `.${className}:hover::placeholder {flex:5;}`,
-      `@media test { .${className} {flex:6;} }`,
-      `@media test { .${className}::placeholder {flex:7;} }`,
-      `@media test { .${className}:active {flex:8;} }`,
-      `@media test { .${className}:hover {flex:9;} }`,
-      `@media test { .${className}:hover::placeholder {flex:10;} }`,
-    ]);
+    expect(getClassNameAndRules(kitchenSink)).toMatchInlineSnapshot(`
+      Object {
+        "className": "_132f3qi _17qtbum _1qo33y1 _1reeka8 _1twewn0 _3xv2tv _5veahi _8rmbh7 _o55ibr _w6ph40",
+        "rules": Array [
+          "._3xv2tv:active { flex:3 }",
+          "._1qo33y1 { flex:1 }",
+          "._17qtbum:hover { flex:4 }",
+          "._o55ibr::placeholder { flex:2 }",
+          "._1twewn0:hover::placeholder { flex:5 }",
+          "@media test { ._1reeka8._1reeka8:active { flex:8 } }",
+          "@media test { ._5veahi._5veahi { flex:6 } }",
+          "@media test { ._8rmbh7._8rmbh7:hover { flex:9 } }",
+          "@media test { ._132f3qi._132f3qi::placeholder { flex:7 } }",
+          "@media test { ._w6ph40._w6ph40:hover::placeholder { flex:10 } }",
+        ],
+      }
+    `);
   });
 
   it('respects media query order', () => {
-    // tslint:disable object-literal-sort-keys
-    let allCSS = '\n';
-    const styleCache = getStyleCache();
-    styleCache.injectOptions({
-      onInsertRule: (css) => {
-        allCSS += css + '\n';
-      },
-    });
-
-    const className = styleCache.getClassName({
-      mediaQueries: {
-        zzzz: 'zzzz',
-        aaaa: 'aaaa',
-      },
-      aaaaFlex: 3,
-      flex: 1,
-      zzzzFlex: 2,
-    });
-
-    expect(allCSS).toEqual(`
-.${className} {flex:1;}
-@media zzzz { .${className} {flex:2;} }
-@media aaaa { .${className} {flex:3;} }
-`);
-    // tslint:enable object-literal-sort-keys
-  });
-
-  it('works with addRule injection', () => {
-    let allCSS = '\n';
-    const styleCache = getStyleCache();
-    styleCache.injectOptions({
-      onInsertRule: (css) => {
-        allCSS += css + '\n';
-      },
-    });
-
-    const className = styleCache.getClassName(kitchenSink);
-
-    expect(allCSS).toEqual(
-      `
-.${className} {flex:1;}
-.${className}::placeholder {flex:2;}
-.${className}:active {flex:3;}
-.${className}:hover {flex:4;}
-.${className}:hover::placeholder {flex:5;}
-@media test { .${className} {flex:6;} }
-@media test { .${className}::placeholder {flex:7;} }
-@media test { .${className}:active {flex:8;} }
-@media test { .${className}:hover {flex:9;} }
-@media test { .${className}:hover::placeholder {flex:10;} }
-`
-    );
+    expect(
+      getClassNameAndRules({
+        mediaQueries: {
+          zzzz: 'zzzz',
+          aaaa: 'aaaa',
+        },
+        aaaaFlex: 3,
+        flex: 1,
+        zzzzFlex: 2,
+      })
+    ).toMatchInlineSnapshot(`
+      Object {
+        "className": "_13e76ud _1qo33y1 _8ehkv8",
+        "rules": Array [
+          "@media aaaa { ._13e76ud._13e76ud { flex:3 } }",
+          "._1qo33y1 { flex:1 }",
+          "@media zzzz { ._8ehkv8._8ehkv8 { flex:2 } }",
+        ],
+      }
+    `);
   });
 
   it('works with classname strategy injection', () => {
@@ -160,21 +156,21 @@ describe('styleCache', () => {
     expect(styleCache.getClassName({ a: 1 })).toEqual('jsxstyle1');
   });
 
-  // prettier-ignore
   it('throws an errors when injections are added incorrectly', () => {
     const styleCache = getStyleCache();
-
-    const alreadyInjectedMsg = 'jsxstyle error: `injectOptions` should be called once and only once.';
-    const cannotInjectMsg = 'jsxstyle error: `injectOptions` must be called before any jsxstyle components mount.';
 
     expect(() => styleCache.injectOptions()).not.toThrow();
 
     // no repeated injections
-    expect(() => styleCache.injectOptions()).toThrowError(alreadyInjectedMsg);
+    expect(() => styleCache.injectOptions()).toThrowErrorMatchingInlineSnapshot(
+      `"jsxstyle error: \`injectOptions\` should be called once and only once."`
+    );
 
     styleCache.getClassName({ a: 1 });
 
     // no injections after getClassName is called
-    expect(() => styleCache.injectOptions()).toThrowError(cannotInjectMsg);
+    expect(() => styleCache.injectOptions()).toThrowErrorMatchingInlineSnapshot(
+      `"jsxstyle error: \`injectOptions\` must be called before any jsxstyle components mount."`
+    );
   });
 });

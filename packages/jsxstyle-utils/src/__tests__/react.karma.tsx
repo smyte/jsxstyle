@@ -47,9 +47,11 @@ describe('jsxstyle', () => {
         node,
         () => {
           const item = document.getElementById(id);
-          expect(item.getAttribute('class')).toEqual('_1fc5o');
+          expect(item!.getAttribute('class')).toEqual(
+            '_14fght8 _19gs3g1 _1mb383g _1qo33y1 _2qghku _cmecz0 _fo6t74 _g2v7xg _tx589f'
+          );
 
-          const style = window.getComputedStyle(item);
+          const style = window.getComputedStyle(item!);
           const styleObj: Record<string, string> = {};
           for (let idx = -1, len = style.length; ++idx < len; ) {
             const k = style[idx];

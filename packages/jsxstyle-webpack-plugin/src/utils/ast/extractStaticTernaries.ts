@@ -1,10 +1,8 @@
 import generate from '@babel/generator';
 import t = require('@babel/types');
 import invariant = require('invariant');
-import { CSSProperties } from 'jsxstyle-utils';
+import { CSSProperties, getRulesForStyleProps } from 'jsxstyle-utils';
 
-import { CacheObject } from '../../types';
-import { getClassNameFromCache } from '../getClassNameFromCache';
 import { StylesByClassName } from '../getStylesByClassName';
 
 export interface Ternary {
@@ -16,8 +14,7 @@ export interface Ternary {
 
 export function extractStaticTernaries(
   ternaries: Ternary[],
-  cacheObject: CacheObject,
-  classNameFormat?: 'hash'
+  getClassName: (key: string) => string
 ): {
   /** styles to be extracted */
   stylesByClassName: StylesByClassName;
@@ -27,10 +24,6 @@ export function extractStaticTernaries(
   invariant(
     Array.isArray(ternaries),
     'extractStaticTernaries expects param 1 to be an array of ternaries'
-  );
-  invariant(
-    cacheObject != null,
-    'extractStaticTernaries expects param 2 to be an object'
   );
 
   if (ternaries.length === 0) {
@@ -90,11 +83,9 @@ export function extractStaticTernaries(
     .map((key, idx) => {
       const { test, consequentStyles, alternateStyles } = ternariesByKey[key];
       const consequentClassName =
-        getClassNameFromCache(consequentStyles, cacheObject, classNameFormat) ||
-        '';
+        getRulesForStyleProps(consequentStyles, getClassName)?.className || '';
       const alternateClassName =
-        getClassNameFromCache(alternateStyles, cacheObject, classNameFormat) ||
-        '';
+        getRulesForStyleProps(alternateStyles, getClassName)?.className || '';
 
       if (!consequentClassName && !alternateClassName) {
         return null;

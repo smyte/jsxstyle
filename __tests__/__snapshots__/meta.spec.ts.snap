@@ -59,6 +59,10 @@ jsxstyle-utils
 - lib/jsxstyle-utils.cjs.js
 - lib/jsxstyle-utils.es.js
 - lib/jsxstyle-utils.js
+- lib/makeAnimationRule.d.ts
+- lib/makeAnimationRule.d.ts.map
+- lib/makeStyleRule.d.ts
+- lib/makeStyleRule.d.ts.map
 - lib/stringHash.d.ts
 - lib/stringHash.d.ts.map
 - lib/types.d.ts
@@ -115,10 +119,6 @@ jsxstyle-webpack-plugin
 - lib/utils/ast/parse.d.ts.map
 - lib/utils/ast/parse.js
 - lib/utils/ast/parse.js.map
-- lib/utils/getClassNameFromCache.d.ts
-- lib/utils/getClassNameFromCache.d.ts.map
-- lib/utils/getClassNameFromCache.js
-- lib/utils/getClassNameFromCache.js.map
 - lib/utils/getStylesByClassName.d.ts
 - lib/utils/getStylesByClassName.d.ts.map
 - lib/utils/getStylesByClassName.js

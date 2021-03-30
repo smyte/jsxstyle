@@ -9,8 +9,6 @@ import { wrapFileSystem } from './utils/wrapFileSystem';
 import Compiler = webpack.Compiler;
 import Compilation = webpack.compilation.Compilation;
 
-const counterKey = Symbol.for('counter');
-
 // TODO submit PR to DefinitelyTyped
 declare module 'webpack' {
   interface Compiler {
@@ -23,9 +21,7 @@ class JsxstyleWebpackPlugin implements webpack.Plugin {
     this.memoryFS = new MemoryFileSystem();
 
     // the default cache object. can be overridden on a per-loader instance basis with the `cacheFile` option.
-    this.cacheObject = {
-      [counterKey]: 0,
-    };
+    this.cacheObject = {};
 
     // context object that gets passed to each loader.
     // available in each loader as this[Symbol.for('jsxstyle-webpack-plugin')]

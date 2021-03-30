@@ -13,7 +13,7 @@ it('builds without issue', () => {
   const fs = new MemoryFS();
   compiler.outputFileSystem = fs;
 
-  expect.assertions(4);
+  expect.assertions(3);
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
       if (err) {
@@ -32,49 +32,59 @@ it('builds without issue', () => {
         console.warn(info.warnings);
       }
 
-      const outputPath = webpackConfig.output?.path || '';
-
-      const redCSS = fs.readFileSync(
-        path.join(outputPath, 'bundle-red.css'),
+      const redCSS: string = fs.readFileSync(
+        path.join(webpackConfig.output!.path!, 'bundle-red.css'),
         'utf8'
       );
-      const blueCSS = fs.readFileSync(
-        path.join(outputPath, 'bundle-blue.css'),
+      const blueCSS: string = fs.readFileSync(
+        path.join(webpackConfig.output!.path!, 'bundle-blue.css'),
         'utf8'
       );
 
-      const sharedStyles = `
-/* ./packages/jsxstyle-webpack-plugin/src/__tests__/webpack/test-app/Shared.js:8 (Block) */
-._1qb53c2 {
-  display: block;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 18px;
-  line-height: 22px;
-}
-      `.trim();
+      const blueCssLines = blueCSS.split('\n').filter(Boolean);
+      const redCssLines = redCSS.split('\n').filter(Boolean);
 
-      expect(redCSS).toContain(
-        `
-/* ./packages/jsxstyle-webpack-plugin/src/__tests__/webpack/test-app/RedApp.js:8 (Inline) */
-._1ioutjs {
-  color: red;
-  display: inline;
-}
-`.trim()
+      const lineStats = redCssLines.reduce(
+        (stats, line) => {
+          if (blueCssLines.includes(line)) {
+            stats.sharedCount++;
+          } else {
+            stats.uniqueCount++;
+          }
+          return stats;
+        },
+        { sharedCount: 0, uniqueCount: 0 }
       );
 
-      expect(blueCSS).toContain(
-        `
-/* ./packages/jsxstyle-webpack-plugin/src/__tests__/webpack/test-app/BlueApp.js:8 (Inline) */
-._1qr3dx1 {
-  color: blue;
-  display: inline;
-}
-`.trim()
-      );
+      expect(lineStats).toMatchInlineSnapshot(`
+        Object {
+          "sharedCount": 5,
+          "uniqueCount": 1,
+        }
+      `);
 
-      expect(redCSS).toContain(sharedStyles);
-      expect(blueCSS).toContain(sharedStyles);
+      expect(redCSS).toMatchInlineSnapshot(`
+        "._1jvcvsh { color:red }
+        ._1lvn9cc { display:inline }
+
+        ._cmecz0 { display:block }
+        ._o000rs { font-family:-apple-system, BlinkMacSystemFont, sans-serif }
+        ._4cg11h { font-size:18px }
+        ._cx69nv { line-height:22px }
+
+        "
+      `);
+      expect(blueCSS).toMatchInlineSnapshot(`
+        "._1mb383g { color:blue }
+        ._1lvn9cc { display:inline }
+
+        ._cmecz0 { display:block }
+        ._o000rs { font-family:-apple-system, BlinkMacSystemFont, sans-serif }
+        ._4cg11h { font-size:18px }
+        ._cx69nv { line-height:22px }
+
+        "
+      `);
 
       resolve();
     });

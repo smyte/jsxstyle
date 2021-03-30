@@ -1,8 +1,5 @@
 import invariant = require('invariant');
-import { CSSProperties } from 'jsxstyle-utils';
-
-import { CacheObject } from '../types';
-import { getClassNameFromCache } from './getClassNameFromCache';
+import { CSSProperties, getRulesForStyleProps } from 'jsxstyle-utils';
 
 const nonStyleProps = {
   children: true,
@@ -21,22 +18,16 @@ export interface StylesByClassName {
   [key: string]: JsxstyleProps;
 }
 
-export function getStylesByClassName(
+export const getStylesByClassName = (
   staticAttributes: Record<string, any>,
-  cacheObject: CacheObject,
-  classNameFormat?: 'hash'
-): StylesByClassName {
+  getClassName: (key: string) => string
+): StylesByClassName => {
   if (typeof staticAttributes !== 'undefined') {
     invariant(
       staticAttributes != null,
       'getStylesByClassName expects an object as its second parameter'
     );
   }
-
-  invariant(
-    cacheObject != null,
-    'getStylesByClassName expects an object as its third parameter'
-  );
 
   const stylesByClassName: StylesByClassName = {};
 
@@ -58,11 +49,8 @@ export function getStylesByClassName(
   }
 
   if (Object.keys(styleProps).length > 0) {
-    const className = getClassNameFromCache(
-      styleProps,
-      cacheObject,
-      classNameFormat
-    );
+    const className = getRulesForStyleProps(styleProps, getClassName)
+      ?.className;
     if (className) {
       stylesByClassName[className] = styleProps;
       if (staticAttributes.mediaQueries) {
@@ -73,4 +61,4 @@ export function getStylesByClassName(
   }
 
   return stylesByClassName;
-}
+};

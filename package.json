@@ -12,7 +12,6 @@
     "prettier": "prettier --write \"**/*.{js,ts,tsx,css,md}\"",
     "release": "yarn test && lerna publish",
     "reset": "rimraf packages/{*,*/*}/lib/",
-    "tsc": "tsc -p packages/jsxstyle-webpack-plugin/tsconfig.json",
     "tslint": "tslint",
     "tslint-all": "find . -type f -name 'tsconfig.json' -not -path '*/node_modules/*' -exec echo {} \\; -exec tslint -p {} \\;",
     "tslint-fix-all": "find . -type f -name 'tsconfig.json' -not -path '*/node_modules/*' -exec echo {} \\; -exec tslint -p {} \\;",

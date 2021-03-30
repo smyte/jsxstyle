@@ -1,3 +1,5 @@
+/// <reference path="./thirdparty.d.ts" />
+
 import { ExtractStylesOptions } from './utils/ast/extractStyles';
 
 export interface CacheObject {

@@ -1,6 +1,6 @@
 import { dangerousStyleValue } from './dangerousStyleValue';
-import { hyphenateStyleName } from './hyphenateStyleName';
-import { stringHash } from './stringHash';
+import { makeAnimationRule } from './makeAnimationRule';
+import { makeStyleRule } from './makeStyleRule';
 
 // global flag makes subsequent calls of capRegex.test advance to the next match
 const capRegex = /[A-Z]/g;
@@ -44,24 +44,10 @@ const sameAxisPropNames: Record<string, [string, string]> = {
   marginV: ['marginTop', 'marginBottom'],
 };
 
-interface StyleObj {
-  styles: string;
-  mediaQuery?: string;
-  pseudoclass?: string;
-  pseudoelement?: string;
-}
-
-export interface StyleKeyObj {
-  stylesByKey: Record<string, StyleObj>;
-  classNameKey: string;
-  /** An object of stringified keyframe styles keyed by animation name */
-  animations?: Record<string, string>;
-}
-
-export function getStyleKeysForProps(
+export function getRulesForStyleProps(
   props: Record<string, any> & { mediaQueries?: Record<string, string> },
-  pretty = false
-): StyleKeyObj | null {
+  getClassName: (key: string) => string
+): { rules: string[]; className: string } | null {
   if (typeof props !== 'object' || props === null) {
     return null;
   }
@@ -74,26 +60,9 @@ export function getStyleKeysForProps(
   }
 
   const mediaQueries = props.mediaQueries;
-  let usesMediaQueries = false;
 
-  const stylesByKey: Record<string, StyleObj> = {};
-
-  const styleKeyObj: StyleKeyObj = {
-    classNameKey: '',
-    stylesByKey,
-  };
-
-  let classNameKey = '';
-  let animations: Record<string, string> | undefined;
-  const seenMQs: Record<string, string> = {};
-
-  const mqSortKeys: Record<string, string> = {};
-  if (mediaQueries != null) {
-    let idx = -1;
-    for (const k in mediaQueries) {
-      mqSortKeys[k] = `@${1000 + ++idx}`;
-    }
-  }
+  const rules: string[] = [];
+  const classNames: string[] = [];
 
   for (let idx = -1; ++idx < keyCount; ) {
     const originalPropName = propKeys[idx];
@@ -109,7 +78,7 @@ export function getStyleKeysForProps(
     let propSansMQ: string | undefined;
     let pseudoelement: string | undefined;
     let pseudoclass: string | undefined;
-    let mqKey: string | undefined;
+    let mediaQuery: string | undefined;
 
     capRegex.lastIndex = 0;
     let splitIndex = 0;
@@ -121,8 +90,7 @@ export function getStyleKeysForProps(
 
     // check for media query prefix
     if (prefix && mediaQueries != null && mediaQueries.hasOwnProperty(prefix)) {
-      usesMediaQueries = true;
-      mqKey = prefix;
+      mediaQuery = mediaQueries[prefix];
       splitIndex = capRegex.lastIndex - 1;
 
       propSansMQ =
@@ -158,107 +126,63 @@ export function getStyleKeysForProps(
     }
 
     let styleValue: any = props[originalPropName];
-    const space = pretty ? ' ' : '';
-    const colon = ':' + space;
-    const newline = pretty ? '\n' : '';
-    const semicolon = ';' + newline;
-    const indent = pretty ? '  ' : '';
     if (
       propName === 'animation' &&
       styleValue &&
       typeof styleValue === 'object'
     ) {
-      let animationValue = newline;
-      for (const k in styleValue) {
-        const obj = styleValue[k];
-        animationValue += k + space + '{' + newline;
-        for (const childPropName in obj) {
-          const value = dangerousStyleValue(childPropName, obj[childPropName]);
-          animationValue +=
-            indent +
-            hyphenateStyleName(childPropName) +
-            colon +
-            value +
-            semicolon;
-        }
-        animationValue += '}' + newline;
-      }
-      const animationKey =
-        'jsxstyle_' + stringHash(animationValue).toString(36);
-      propName = 'animationName';
-      styleValue = animationKey;
-      animations = animations || {};
-      animations[animationKey] = animationValue;
-    } else {
-      styleValue = dangerousStyleValue(propName, props[originalPropName]);
-      if (styleValue === '') {
-        continue;
-      }
+      const rule = makeAnimationRule(styleValue, getClassName);
+      if (!rule) continue;
+      classNames.push(rule.className);
+      rules.push(rule.animation, rule.rule);
+      continue;
     }
 
-    const mediaQuery = mqKey && mediaQueries![mqKey];
-    const mqSortKey = mqKey && mqSortKeys[mqKey];
-
-    const key =
-      '.' +
-      (mqSortKey || '') +
-      (pseudoclass ? ':' + pseudoclass : '') +
-      (pseudoelement ? '::' + pseudoelement : '');
-
-    if (!stylesByKey.hasOwnProperty(key)) {
-      stylesByKey[key] = { styles: newline };
-      if (mediaQuery) {
-        stylesByKey[key].mediaQuery = mediaQuery;
-      }
-      if (pseudoclass) {
-        stylesByKey[key].pseudoclass = pseudoclass;
-      }
-      if (pseudoelement) {
-        stylesByKey[key].pseudoelement = pseudoelement;
-      }
+    styleValue = dangerousStyleValue(propName, props[originalPropName]);
+    if (styleValue === '') {
+      continue;
     }
-
-    if (mediaQuery) {
-      seenMQs[mediaQuery] = seenMQs[mediaQuery] || '';
-      seenMQs[mediaQuery] += propSansMQ + ':' + styleValue + ';';
-    } else {
-      classNameKey += originalPropName + ':' + styleValue + ';';
-    }
-
-    const value = colon + styleValue + semicolon;
 
     const propArray = sameAxisPropNames[propName];
     if (propArray) {
-      stylesByKey[key].styles +=
-        indent +
-        hyphenateStyleName(propArray[0]) +
-        value +
-        indent +
-        hyphenateStyleName(propArray[1]) +
-        value;
+      const rule1 = makeStyleRule(
+        propArray[0],
+        styleValue,
+        getClassName,
+        pseudoelement,
+        pseudoclass,
+        mediaQuery
+      );
+
+      const rule2 = makeStyleRule(
+        propArray[1],
+        styleValue,
+        getClassName,
+        pseudoelement,
+        pseudoclass,
+        mediaQuery
+      );
+
+      classNames.push(rule1.className, rule2.className);
+      rules.push(rule1.rule, rule2.rule);
     } else {
-      stylesByKey[key].styles += indent + hyphenateStyleName(propName) + value;
+      const rule = makeStyleRule(
+        propName,
+        styleValue,
+        getClassName,
+        pseudoelement,
+        pseudoclass,
+        mediaQuery
+      );
+
+      classNames.push(rule.className);
+      rules.push(rule.rule);
     }
   }
 
-  // append media query key
-  if (usesMediaQueries) {
-    const mqKeys = Object.keys(seenMQs).sort();
-    for (let idx = -1, len = mqKeys.length; ++idx < len; ) {
-      const mediaQuery = mqKeys[idx];
-      classNameKey += `@${mediaQuery}~${seenMQs[mediaQuery]}`;
-    }
-  }
-
-  if (classNameKey === '') {
+  if (classNames.length === 0) {
     return null;
   }
 
-  if (animations) {
-    styleKeyObj.animations = animations;
-  }
-
-  styleKeyObj.classNameKey = classNameKey;
-
-  return styleKeyObj;
+  return { rules, className: classNames.sort().join(' ') };
 }

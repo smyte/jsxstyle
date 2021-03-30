@@ -3,7 +3,11 @@ import traverse, { NodePath, TraverseOptions } from '@babel/traverse';
 import t = require('@babel/types');
 import Ajv = require('ajv');
 import invariant = require('invariant');
-import { componentStyles, getStyleKeysForProps } from 'jsxstyle-utils';
+import {
+  componentStyles,
+  getRulesForStyleProps,
+  stringHash,
+} from 'jsxstyle-utils';
 import path = require('path');
 import util = require('util');
 import vm = require('vm');
@@ -29,6 +33,7 @@ export interface ExtractStylesOptions {
   /** @deprecated */
   styleGroups?: Array<Record<string, any>>;
   whitelistedModules?: string[];
+  /** @deprecated */
   cssModules?: boolean;
   evaluateVars?: boolean;
 }
@@ -66,6 +71,31 @@ const JSXSTYLE_SOURCES = {
 const matchMediaHookName = 'useMatchMedia';
 
 const defaultStyleAttributes: Record<string, t.JSXAttribute[]> = {};
+
+const getHashedClassName = (key: string) => '_' + stringHash(key).toString(36);
+
+const counterKey = Symbol.for('counter');
+
+const createIncrementingClassNameGetter = (cacheObject: CacheObject) => {
+  // sigh: https://github.com/microsoft/TypeScript/issues/1863
+  cacheObject[counterKey as any] =
+    typeof cacheObject[counterKey as any] === 'number'
+      ? cacheObject[counterKey as any]
+      : -1;
+  return () => '_x' + (++cacheObject[counterKey as any]).toString(36);
+};
+
+const memoizeClassNameGetter = (
+  getClassName: (key: string) => string,
+  cacheObject: CacheObject
+) => {
+  return (key: string) => {
+    if (!cacheObject[key]) {
+      cacheObject[key] = getClassName(key);
+    }
+    return cacheObject[key];
+  };
+};
 
 for (const componentName in componentStyles) {
   const styleObj =
@@ -167,14 +197,19 @@ export function extractStyles(
     classNameFormat,
     parserPlugins: _parserPlugins,
     whitelistedModules,
-    cssModules,
     evaluateVars = true,
   } = options;
 
+  const getClassName = memoizeClassNameGetter(
+    classNameFormat === 'hash'
+      ? getHashedClassName
+      : createIncrementingClassNameGetter(cacheObject),
+    cacheObject
+  );
+
   const sourceDir = path.dirname(sourceFileName);
 
-  // Using a map for (officially supported) guaranteed insertion order
-  const cssMap = new Map<string, { css: string; commentTexts: string[] }>();
+  const cssRules: string[] = [];
 
   const parserPlugins = _parserPlugins ? _parserPlugins.slice() : [];
   if (/\.tsx?$/.test(sourceFileName)) {
@@ -187,7 +222,7 @@ export function extractStyles(
   const ast = parse(src, parserPlugins);
 
   let jsxstyleSrc: string | null = null;
-  const validComponents = {};
+  const validComponents: Record<string, string> = {};
   // default to using require syntax
   let useImportSyntax = false;
   let hasValidComponents = false;
@@ -965,8 +1000,7 @@ export function extractStyles(
 
         const stylesByClassName = getStylesByClassName(
           staticAttributes,
-          cacheObject,
-          classNameFormat
+          getClassName
         );
 
         const extractedStyleClassNames = Object.keys(stylesByClassName).join(
@@ -987,8 +1021,7 @@ export function extractStyles(
         if (staticTernaries.length > 0) {
           const ternaryObj = extractStaticTernaries(
             staticTernaries,
-            cacheObject,
-            classNameFormat
+            getClassName
           );
 
           // ternaryObj is null if all of the extracted ternaries have falsey consequents and alternates
@@ -1084,63 +1117,19 @@ export function extractStyles(
           }
         }
 
-        const lineNumbers =
-          node.loc &&
-          node.loc.start.line +
-            (node.loc.start.line !== node.loc.end.line
-              ? `-${node.loc.end.line}`
-              : '');
-
-        const comment = util.format(
-          '/* %s:%s (%s) */',
-          sourceFileName.replace(process.cwd(), '.'),
-          lineNumbers,
-          originalNodeName
-        );
-
         for (const className in stylesByClassName) {
-          if (cssMap.has(className)) {
-            if (comment) {
-              const val = cssMap.get(className)!;
-              val.commentTexts.push(comment);
-              cssMap.set(className, val);
+          const styleProps = stylesByClassName[className];
+
+          // get object of style objects
+          const result = getRulesForStyleProps(styleProps, getClassName);
+          if (result == null) {
+            continue;
+          }
+
+          for (const value of result.rules) {
+            if (!cssRules.includes(value)) {
+              cssRules.push(value);
             }
-          } else {
-            let css = '';
-            const styleProps = stylesByClassName[className];
-
-            // get object of style objects
-            const styleObjects = getStyleKeysForProps(styleProps, true);
-            if (styleObjects == null) {
-              continue;
-            }
-            const styleObjectKeys = Object.keys(
-              styleObjects.stylesByKey
-            ).sort();
-
-            for (const k of styleObjectKeys) {
-              const item = styleObjects.stylesByKey[k];
-              let itemCSS =
-                (cssModules ? ':global ' : '') +
-                `.${className}` +
-                (item.pseudoclass ? ':' + item.pseudoclass : '') +
-                (item.pseudoelement ? '::' + item.pseudoelement : '') +
-                ` {${item.styles}}`;
-
-              if (item.mediaQuery) {
-                itemCSS = `@media ${item.mediaQuery} { ${itemCSS} }`;
-              }
-              css += itemCSS + '\n';
-            }
-
-            if (styleObjects.animations) {
-              for (const animationKey in styleObjects.animations) {
-                const value = styleObjects.animations[animationKey];
-                css += `@keyframes ${animationKey} {${value}}\n`;
-              }
-            }
-
-            cssMap.set(className, { css, commentTexts: [comment] });
           }
         }
       },
@@ -1177,9 +1166,7 @@ export function extractStyles(
   };
   traverse(ast, traverseOptions);
 
-  const resultCSS = Array.from(cssMap.values())
-    .map((n) => n.commentTexts.map((txt) => `${txt}\n`).join('') + n.css)
-    .join('');
+  const resultCSS = cssRules.join('\n') + '\n';
   // path.parse doesn't exist in the webpack'd bundle but path.dirname and path.basename do.
   const extName = path.extname(sourceFileName);
   const baseName = path.basename(sourceFileName, extName);
