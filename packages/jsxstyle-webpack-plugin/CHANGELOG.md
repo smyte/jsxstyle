@@ -1,6 +1,16 @@
 # jsxstyle-webpack-plugin
 
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [f6408ad]
+- Updated dependencies [f6408ad]
+  - jsxstyle-utils@3.0.0
+  - jsxstyle@3.0.0
+
 ## 1.5.0
+
 ### Minor Changes
 
 - 5c7973f: - Update webpack peer dep range to include version 5
